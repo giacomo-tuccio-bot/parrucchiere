@@ -1,12 +1,12 @@
 const crypto = require('crypto');
 const {
-  clean, readBody, zonedTimeToUtcIso, addDays, toMinutes, fromMinutes, dateIsValid, timeIsValid,
-  slotsForDate, openingWindow, overlaps, slotRange, slotHasStarted, SLOT_MINUTES,
+  clean, readBody, adminPin, findService, TIMEZONE, zonedTimeToUtcIso, addDays, toMinutes, fromMinutes,
+  dateIsValid, timeIsValid, slotsForDate, openingWindow, overlaps, slotRange, slotHasStarted,
   listEvents, createEvent, getEvent, deleteEvent, rangeIsFree,
 } = require('./_lib');
 
 function pinMatches(pin) {
-  const expected = String(process.env.ADMIN_PIN || '');
+  const expected = adminPin();
   if (!expected) return false;
   const a = crypto.createHash('sha256').update(String(pin || '')).digest();
   const b = crypto.createHash('sha256').update(expected).digest();
@@ -21,7 +21,7 @@ function eventRange(event) {
 
 function describeEvent(event) {
   const range = eventRange(event);
-  const fmt = iso => new Intl.DateTimeFormat('it-IT', { timeZone: 'Europe/Rome', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
+  const fmt = iso => new Intl.DateTimeFormat('it-IT', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
   return {
     id: event.id,
     type: event.extendedProperties?.private?.salonType || 'external',
@@ -76,7 +76,7 @@ function blockSummary(reason) {
 
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
-  if (!process.env.ADMIN_PIN) return res.status(500).json({ ok: false, error: 'ADMIN_PIN non configurato su Vercel.' });
+  if (!adminPin()) return res.status(500).json({ ok: false, error: 'ADMIN_PIN non configurato su Vercel.' });
   if (!pinMatches(req.headers['x-admin-pin'])) return res.status(401).json({ ok: false, error: 'PIN non corretto.' });
 
   try {
@@ -139,16 +139,18 @@ module.exports = async function handler(req, res) {
       const phone = clean(body.phone, 40);
       const notes = clean(body.notes, 1000);
       const start = clean(body.time, 5);
+      const service = findService(clean(body.service, 40));
       if (!name) return res.status(400).json({ ok: false, error: 'Inserisci il nome del cliente.' });
+      if (!service) return res.status(400).json({ ok: false, error: 'Scegli un servizio.' });
       if (!timeIsValid(start)) return res.status(400).json({ ok: false, error: 'Orario non valido.' });
-      const end = fromMinutes(toMinutes(start) + SLOT_MINUTES);
+      const end = fromMinutes(toMinutes(start) + service.duration);
       if (!(await rangeIsFree(date, start, end))) {
-        return res.status(409).json({ ok: false, error: 'Orario già occupato o bloccato.' });
+        return res.status(409).json({ ok: false, error: `Non c'è spazio per ${service.name} (${service.duration} min) dalle ${start}: l'orario si sovrappone a un altro appuntamento o blocco.` });
       }
       const event = await createEvent({
         type: 'phone', date, start, end,
-        summary: `📞 Taglio – ${name}`,
-        description: ['Prenotazione telefonica', `Cliente: ${name}`, phone ? `Telefono: ${phone}` : null, `Note: ${notes || 'nessuna'}`].filter(Boolean).join('\n'),
+        summary: `📞 ${service.name} – ${name}`,
+        description: ['Prenotazione telefonica', `Servizio: ${service.name}`, `Cliente: ${name}`, phone ? `Telefono: ${phone}` : null, `Note: ${notes || 'nessuna'}`].filter(Boolean).join('\n'),
       });
       return res.status(200).json({ ok: true, eventId: event.id });
     }

@@ -4,13 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex">
-  <title>Agenda salone</title>
+  <title>Agenda</title>
+  <meta name="theme-color" content="#1d1b19">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Agenda">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+  <div class="demo-banner hidden" id="demoBanner">Versione dimostrativa · PIN 1234 · gli appuntamenti sono di esempio.</div>
   <header>
     <div class="container nav">
-      <a class="brand" href="/admin">AGENDA <span>SALONE</span></a>
+      <a class="brand" href="/admin"><span data-salon-name></span> <small class="brand-sub">agenda</small></a>
       <div style="display:flex;gap:14px;align-items:center">
         <a class="small" href="/" target="_blank">Pagina clienti</a>
         <button class="btn ghost sm hidden" id="logoutBtn" style="color:#fff;border-color:rgba(255,255,255,.3)">Esci</button>
@@ -77,6 +84,7 @@
     <form id="phoneForm" method="dialog">
       <h2>📞 Prenotazione telefonica</h2>
       <div class="summary" id="phoneSummary"></div>
+      <div class="field"><label for="phoneService">Servizio *</label><select id="phoneService" required></select></div>
       <div class="field"><label for="phoneName">Nome cliente *</label><input id="phoneName" required maxlength="80"></div>
       <div class="field"><label for="phoneNumber">Telefono</label><input id="phoneNumber" type="tel" maxlength="40"></div>
       <div class="field"><label for="phoneNotes">Note</label><textarea id="phoneNotes" rows="2" maxlength="1000"></textarea></div>
@@ -87,6 +95,7 @@
     </form>
   </dialog>
 
+  <script src="/salon.js"></script>
   <script src="/admin.js"></script>
 </body>
 </html>

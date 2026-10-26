@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Informativa privacy</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header>
+    <div class="container nav"><a class="brand" href="/" data-salon-name></a></div>
+  </header>
+  <main class="container">
+    <article class="card legal" id="policy">
+      <h1>Informativa sul trattamento dei dati personali</h1>
+      <p class="muted">Ai sensi degli artt. 13 e 14 del Regolamento (UE) 2016/679 (GDPR)</p>
+
+      <h2>Titolare del trattamento</h2>
+      <p><span data-owner></span><span data-owner-extra></span></p>
+
+      <h2>Quali dati raccogliamo</h2>
+      <p>Quando prenoti un appuntamento raccogliamo nome e cognome, numero di telefono, eventuale indirizzo email, eventuali note, il servizio scelto e la data e l'ora dell'appuntamento.</p>
+
+      <h2>Perché li trattiamo</h2>
+      <p>Usiamo i dati esclusivamente per gestire la prenotazione: registrare l'appuntamento, contattarti in caso di modifiche o disdette e, se hai indicato l'email, inviarti la conferma. Base giuridica: esecuzione di misure precontrattuali richieste dall'interessato e consenso (art. 6, par. 1, lett. a e b GDPR).</p>
+
+      <h2>Come li conserviamo</h2>
+      <p>Gli appuntamenti sono registrati nell'agenda del salone su Google Calendar (Google Ireland Ltd.), accessibile solo al titolare e al personale autorizzato. Le eventuali email di conferma sono inviate tramite un fornitore di servizi email. I dati non sono ceduti a terzi né usati per finalità di marketing.</p>
+
+      <h2>Per quanto tempo</h2>
+      <p>I dati sono conservati per il tempo necessario a gestire l'appuntamento e comunque non oltre 12 mesi, salvo obblighi di legge.</p>
+
+      <h2>I tuoi diritti</h2>
+      <p>Puoi chiedere in qualsiasi momento l'accesso, la rettifica o la cancellazione dei tuoi dati, la limitazione del trattamento, la portabilità e revocare il consenso, contattando il titolare<span data-contact></span>. Hai inoltre diritto di proporre reclamo al Garante per la protezione dei dati personali (www.garanteprivacy.it).</p>
+
+      <h2>Cookie</h2>
+      <p>Questo sito non utilizza cookie di profilazione né strumenti di tracciamento. L'area riservata al salone memorizza l'accesso solo per la durata della sessione del browser.</p>
+
+      <p><a class="btn ghost sm" href="/">← Torna alle prenotazioni</a></p>
+    </article>
+  </main>
+  <script src="/salon.js"></script>
+  <script>
+    Salon.ready.then(c => {
+      document.querySelector('[data-owner]').textContent = c.owner || c.name;
+      document.querySelector('[data-owner-extra]').textContent = [c.address, c.vatNumber && `P.IVA ${c.vatNumber}`].filter(Boolean).map(v => ` · ${v}`).join('');
+      const contact = [c.email && `all'indirizzo ${c.email}`, c.phone && `al numero ${c.phone}`].filter(Boolean).join(' oppure ');
+      document.querySelector('[data-contact]').textContent = contact ? ` ${contact}` : ' presso il salone';
+    });
+  </script>
+</body>
+</html>

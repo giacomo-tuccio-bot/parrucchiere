@@ -1,10 +1,10 @@
 const {
-  clean, zonedTimeToUtcIso, slotsForDate, openingWindow, overlaps, slotRange,
-  slotHasStarted, isBookableDate, getBusyWindows,
+  config, clean, zonedTimeToUtcIso, slotsForDate, openingWindow, overlaps, slotRange,
+  slotHasStarted, isBookableDate, getBusyWindows, findService,
 } = require('./_lib');
 
-function availabilityForDate(date, busy) {
-  const slots = slotsForDate(date);
+function availabilityForDate(date, duration, busy) {
+  const slots = slotsForDate(date, duration);
   const bookable = isBookableDate(date);
   const freeSlots = [];
   const busySlots = [];
@@ -17,7 +17,7 @@ function availabilityForDate(date, busy) {
     totalSlots: slots.length,
     freeSlots,
     busySlots,
-    status: !slots.length || !freeSlots.length ? 'full' : busySlots.length ? 'partial' : 'free',
+    status: !slots.length || !freeSlots.length ? 'full' : freeSlots.length <= Math.max(2, slots.length / 4) ? 'partial' : 'free',
   };
 }
 
@@ -29,6 +29,7 @@ module.exports = async function handler(req, res) {
 
   const date = clean(req.query?.date, 20);
   const month = clean(req.query?.month, 10);
+  const service = findService(clean(req.query?.service, 40)) || config.services[0];
   const validDate = /^\d{4}-\d{2}-\d{2}$/.test(date);
   const validMonth = /^\d{4}-\d{2}$/.test(month);
   if (!validDate && !validMonth) return res.status(400).json({ ok: false, error: 'Data o mese non valido.' });
@@ -48,8 +49,8 @@ module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
   if (!dates.length) {
     return validMonth
-      ? res.status(200).json({ ok: true, month, days: {} })
-      : res.status(200).json({ ok: true, date, totalSlots: 0, freeSlots: [], busySlots: [], status: 'closed' });
+      ? res.status(200).json({ ok: true, month, service: service.id, days: {} })
+      : res.status(200).json({ ok: true, date, service: service.id, totalSlots: 0, freeSlots: [], busySlots: [], status: 'closed' });
   }
 
   try {
@@ -60,10 +61,10 @@ module.exports = async function handler(req, res) {
     );
     if (validMonth) {
       const days = {};
-      for (const d of dates) days[d] = availabilityForDate(d, busy);
-      return res.status(200).json({ ok: true, month, days });
+      for (const d of dates) days[d] = availabilityForDate(d, service.duration, busy);
+      return res.status(200).json({ ok: true, month, service: service.id, days });
     }
-    return res.status(200).json({ ok: true, date, ...availabilityForDate(date, busy) });
+    return res.status(200).json({ ok: true, date, service: service.id, duration: service.duration, ...availabilityForDate(date, service.duration, busy) });
   } catch (error) {
     console.error('Errore disponibilità Google Calendar:', error);
     return res.status(502).json({ ok: false, error: 'Disponibilità temporaneamente non disponibile.' });

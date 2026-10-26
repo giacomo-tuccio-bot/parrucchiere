@@ -15,6 +15,12 @@
   let date = todayKey();
   let day = null;
   let phoneTime = null;
+  let services = [];
+  Salon.ready.then(config => {
+    services = config.services;
+    $('phoneService').innerHTML = services.map(s => `<option value="${esc(s.id)}">${esc(s.name)} (${s.duration} min)</option>`).join('');
+  });
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
   async function api(method, payload, query = '') {
     const res = await fetch(`/api/admin${query}`, {
@@ -27,8 +33,8 @@
     return data;
   }
 
-  function showMsg(text, ok = true) {
-    $('panelMsg').innerHTML = text ? `<p class="msg ${ok ? 'ok' : 'err'}">${esc(text)}</p>` : '';
+  function showMsg(text, kind = 'ok') {
+    $('panelMsg').innerHTML = text ? `<p class="msg ${kind}">${esc(text)}</p>` : '';
   }
 
   function logout(message) {
@@ -110,9 +116,9 @@
   }
 
   async function run(payload, okText) {
-    showMsg('Salvataggio…');
+    showMsg('Salvataggio…', 'info');
     const data = await api('POST', payload);
-    if (!data.ok) return showMsg(data.error || 'Operazione non riuscita.', false);
+    if (!data.ok) return showMsg(data.error || 'Operazione non riuscita.', 'err');
     showMsg(okText);
     loadDay();
   }
@@ -128,6 +134,7 @@
     if (act === 'phone') {
       phoneTime = time;
       $('phoneForm').reset();
+      if (services[0]) $('phoneService').value = services[0].id;
       $('phoneSummary').textContent = `${dayFmt.format(new Date(`${date}T12:00:00Z`))} · ${time}`;
       $('phoneDialog').showModal();
       $('phoneName').focus();
@@ -156,7 +163,7 @@
     e.preventDefault();
     $('phoneDialog').close();
     run({
-      action: 'phone', date, time: phoneTime,
+      action: 'phone', date, time: phoneTime, service: $('phoneService').value,
       name: $('phoneName').value, phone: $('phoneNumber').value, notes: $('phoneNotes').value,
     }, `Appuntamento delle ${phoneTime} salvato.`);
   });
