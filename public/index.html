@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Prenota il tuo taglio · Salone</title>
+  <meta name="description" content="Prenota online il tuo taglio. Aperti dal martedì al sabato, 9–13 e 14–20.">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="/">IL <span>SALONE</span></a>
+      <a class="small" href="/admin">Area salone</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Prenota il tuo taglio<br>in pochi secondi</h1>
+      <p>Scegli il giorno e l'orario che preferisci: la prenotazione finisce subito nella nostra agenda.</p>
+      <div class="hours">
+        <span class="pill">Martedì – Sabato</span>
+        <span class="pill">9:00 – 13:00</span>
+        <span class="pill">14:00 – 20:00</span>
+        <span class="pill">Domenica e lunedì chiuso</span>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="booking-layout">
+      <section class="card">
+        <h2>1. Scegli il giorno</h2>
+        <div class="cal-head">
+          <button class="btn ghost sm" id="prevMonth" aria-label="Mese precedente">‹</button>
+          <strong id="monthLabel"></strong>
+          <button class="btn ghost sm" id="nextMonth" aria-label="Mese successivo">›</button>
+        </div>
+        <div class="cal-grid" id="calendar"></div>
+        <div class="legend">
+          <span><i style="background:var(--free)"></i>Libero</span>
+          <span><i style="background:var(--phone)"></i>Pochi posti</span>
+          <span><i style="background:var(--busy)"></i>Completo</span>
+        </div>
+
+        <h2 style="margin-top:22px">2. Scegli l'orario</h2>
+        <div id="slotsBox"><p class="muted">Seleziona un giorno dal calendario.</p></div>
+      </section>
+
+      <section class="card">
+        <h2>3. I tuoi dati</h2>
+        <form id="bookingForm">
+          <div class="summary" id="summary">Nessun orario selezionato</div>
+          <div class="field"><label for="name">Nome e cognome *</label><input id="name" name="name" required maxlength="80" autocomplete="name"></div>
+          <div class="field"><label for="phone">Telefono *</label><input id="phone" name="phone" type="tel" required maxlength="40" autocomplete="tel"></div>
+          <div class="field"><label for="email">Email (per ricevere la conferma)</label><input id="email" name="email" type="email" maxlength="160" autocomplete="email"></div>
+          <div class="field"><label for="notes">Note</label><textarea id="notes" name="notes" rows="3" maxlength="1000" placeholder="Es. taglio + barba, capelli lunghi…"></textarea></div>
+          <button class="btn" type="submit" id="submitBtn" disabled>Prenota taglio (40 min)</button>
+          <div id="formMsg"></div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer>Per spostare o disdire un appuntamento contatta il salone.</footer>
+  <script src="/app.js"></script>
+</body>
+</html>

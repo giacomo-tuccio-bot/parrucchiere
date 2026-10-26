@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Agenda salone</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="/admin">AGENDA <span>SALONE</span></a>
+      <div style="display:flex;gap:14px;align-items:center">
+        <a class="small" href="/" target="_blank">Pagina clienti</a>
+        <button class="btn ghost sm hidden" id="logoutBtn" style="color:#fff;border-color:rgba(255,255,255,.3)">Esci</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <form class="card login" id="loginForm">
+      <h2>Accesso salone</h2>
+      <p class="muted">Inserisci il PIN condiviso con lo staff.</p>
+      <div class="field"><label for="pin">PIN</label><input id="pin" type="password" inputmode="numeric" autocomplete="current-password" required></div>
+      <button class="btn" type="submit">Entra</button>
+      <div id="loginMsg"></div>
+    </form>
+
+    <div id="panel" class="hidden">
+      <div class="admin-top">
+        <h1 id="dayTitle"></h1>
+        <button class="btn ghost sm" id="prevDay">‹ Giorno prima</button>
+        <button class="btn ghost sm" id="todayBtn">Oggi</button>
+        <button class="btn ghost sm" id="nextDay">Giorno dopo ›</button>
+        <input type="date" id="datePicker">
+      </div>
+
+      <div class="admin-grid">
+        <section class="card">
+          <div class="block-bar">
+            <input id="blockReason" placeholder="Motivo (facoltativo)" maxlength="120">
+            <button class="btn dark sm" id="blockSelected" disabled>🔒 Blocca selezionati</button>
+          </div>
+          <div id="slotList"></div>
+          <div id="panelMsg"></div>
+        </section>
+
+        <aside>
+          <section class="card" id="rangeCard">
+            <h2>Blocca un intervallo</h2>
+            <p class="muted" style="margin-top:-6px">Per impegni, pause o ferie di qualche ora.</p>
+            <form id="rangeForm">
+              <div class="row2">
+                <div class="field"><label for="rangeStart">Dalle</label><input id="rangeStart" type="time" value="09:00" step="300" required></div>
+                <div class="field"><label for="rangeEnd">Alle</label><input id="rangeEnd" type="time" value="13:00" step="300" required></div>
+              </div>
+              <div class="field"><label for="rangeReason">Motivo</label><input id="rangeReason" maxlength="120" placeholder="Es. dentista, corso…"></div>
+              <div class="toolbar">
+                <button class="btn dark sm" type="submit">Blocca intervallo</button>
+                <button class="btn danger sm" type="button" id="blockDay">Chiudi tutto il giorno</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="card" style="margin-top:20px">
+            <h2>Legenda</h2>
+            <p style="margin:0"><span class="tag free">libero</span><span class="tag booking">online</span><span class="tag phone">telefono</span><span class="tag block">bloccato</span><span class="tag external">Google</span></p>
+            <p class="muted" style="font-size:.85rem;margin-bottom:0">Gli appuntamenti inseriti direttamente su Google Calendar (anche dai colleghi) occupano l'orario e si modificano da Google Calendar.</p>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <dialog id="phoneDialog">
+    <form id="phoneForm" method="dialog">
+      <h2>📞 Prenotazione telefonica</h2>
+      <div class="summary" id="phoneSummary"></div>
+      <div class="field"><label for="phoneName">Nome cliente *</label><input id="phoneName" required maxlength="80"></div>
+      <div class="field"><label for="phoneNumber">Telefono</label><input id="phoneNumber" type="tel" maxlength="40"></div>
+      <div class="field"><label for="phoneNotes">Note</label><textarea id="phoneNotes" rows="2" maxlength="1000"></textarea></div>
+      <div class="toolbar">
+        <button class="btn" type="submit" value="save">Salva</button>
+        <button class="btn ghost" type="button" id="phoneCancel">Annulla</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/admin.js"></script>
+</body>
+</html>
